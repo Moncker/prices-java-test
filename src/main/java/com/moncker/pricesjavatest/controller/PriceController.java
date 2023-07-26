@@ -1,7 +1,7 @@
 package com.moncker.pricesjavatest.controller;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,8 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.moncker.pricesjavatest.model.Price;
 import com.moncker.pricesjavatest.request.PriceRequest;
 import com.moncker.pricesjavatest.response.PriceResponse;
 import com.moncker.pricesjavatest.service.PriceService;
@@ -30,6 +28,9 @@ public class PriceController {
 		
 		PriceResponse priceResponse = priceService.getApplicablePrice(
 		PriceRequest.builder().productId(productId).brandId(brandId).date(date).build());
+		
+		if (priceResponse == null)
+			throw new NoSuchElementException();
 		
 		return new ResponseEntity<> (priceResponse, HttpStatus.OK);
 		

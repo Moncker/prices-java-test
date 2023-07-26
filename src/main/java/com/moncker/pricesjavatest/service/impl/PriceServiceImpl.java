@@ -1,6 +1,8 @@
 package com.moncker.pricesjavatest.service.impl;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,27 @@ public class PriceServiceImpl implements PriceService{
 
 	@Override
 	public PriceResponse getApplicablePrice(PriceRequest priceRequest) {
-		List<Price> prices = (List<Price>) priceRepository.findAll();
 		
-		PriceResponse priceResponse = PriceResponse.builder().brandId(prices.get(0).getBrandId()).build(); 
+		List<Price> prices = (List<Price>) priceRepository.findByProductIdAndBrandIdAndStartDateBeforeAndEndDateAfter(
+				priceRequest.getProductId(), priceRequest.getBrandId(), priceRequest.getDate(), priceRequest.getDate());
+		
+		if (prices.size() == 0)
+			return null;
+		Price price;
+		if (prices.size() == 1) {
+			price = prices.get(0);
+
+		}else {
+			price = prices.stream().max(Comparator.comparing(Price::getPriority))
+					.orElseThrow(NoSuchElementException::new);
+		}
+		PriceResponse priceResponse = PriceResponse.builder()
+				.productId(price.getProductId())
+				.brandId(price.getBrandId())
+				.tarifa(price.getPriceList())
+				.startDate(price.getStartDate())
+				.endDate(price.getEndDate())
+				.price(price.getPrice()).build();
 		
 		return priceResponse;
 	}
