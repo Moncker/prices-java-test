@@ -4,7 +4,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.moncker.pricesjavatest.model.Price;
@@ -20,17 +22,17 @@ public class PriceServiceImpl implements PriceService{
 	PriceRepository priceRepository;
 
 	@Override
-	public PriceResponse getApplicablePrice(PriceRequest priceRequest) {
+	public PriceResponse getApplicablePrice(PriceRequest priceRequest) throws NotFoundException {
 		
 		List<Price> prices = (List<Price>) priceRepository.findByProductIdAndBrandIdAndStartDateBeforeAndEndDateAfter(
 				priceRequest.getProductId(), priceRequest.getBrandId(), priceRequest.getDate(), priceRequest.getDate());
 		
 		if (prices.size() == 0)
-			return null;
+			throw new NotFoundException();
+		
 		Price price;
 		if (prices.size() == 1) {
 			price = prices.get(0);
-
 		}else {
 			price = prices.stream().max(Comparator.comparing(Price::getPriority))
 					.orElseThrow(NoSuchElementException::new);
