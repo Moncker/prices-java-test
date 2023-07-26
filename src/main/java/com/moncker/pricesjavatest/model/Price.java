@@ -17,7 +17,7 @@ import lombok.Data;
 public class Price {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy= GenerationType.AUTO)
 	@Column(name = "price_id")
 	int priceId;
 	
@@ -31,19 +31,19 @@ public class Price {
 	LocalDateTime endDate;
 	
 	@Column(name = "price_list")
-	LocalDate priceList;
+	int priceList;
 	
 	@Column(name = "product_id")
-	LocalDate productId;
+	String productId;
 	
 	@Column(name = "priority")
-	LocalDate priority;
+	int priority;
 	
 	@Column(name = "price")
-	LocalDate price;
+	double price;
 	
 	@Column(name = "curr")
-	LocalDate currency;
+	String currency;
 	
 	
 }
