@@ -11,11 +11,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "Prices")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Price {
 
 	@Id
