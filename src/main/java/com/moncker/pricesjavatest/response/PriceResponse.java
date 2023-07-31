@@ -11,7 +11,7 @@ public class PriceResponse {
 	
 	String productId;
 	int brandId;
-	int tarifa;
+	String tarifa;
 	
 	LocalDateTime startDate;
 	LocalDateTime endDate;

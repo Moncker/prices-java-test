@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.moncker.pricesjavatest.model.Brand;
 import com.moncker.pricesjavatest.model.Price;
+import com.moncker.pricesjavatest.repository.BrandRepository;
 import com.moncker.pricesjavatest.repository.PriceRepository;
 import com.moncker.pricesjavatest.request.PriceRequest;
 import com.moncker.pricesjavatest.response.PriceResponse;
@@ -20,12 +22,17 @@ public class PriceServiceImpl implements PriceService{
 	
 	@Autowired
 	PriceRepository priceRepository;
+	
+	@Autowired
+	BrandRepository brandRepository;
 
 	@Override
 	public PriceResponse getApplicablePrice(PriceRequest priceRequest) throws NotFoundException {
 		
 		List<Price> prices = (List<Price>) priceRepository.findByProductIdAndBrandIdAndStartDateBeforeAndEndDateAfter(
 				priceRequest.getProductId(), priceRequest.getBrandId(), priceRequest.getDate(), priceRequest.getDate());
+		
+		
 		
 		if (prices.size() == 0)
 			throw new NotFoundException();
@@ -37,10 +44,13 @@ public class PriceServiceImpl implements PriceService{
 			price = prices.stream().max(Comparator.comparing(Price::getPriority))
 					.orElseThrow(NoSuchElementException::new);
 		}
+		Brand brand = brandRepository.findById(price.getBrandId())
+				.orElseThrow(NotFoundException::new);
+		
 		PriceResponse priceResponse = PriceResponse.builder()
 				.productId(price.getProductId())
 				.brandId(price.getBrandId())
-				.tarifa(price.getPriceList())
+				.tarifa(brand.getName())
 				.startDate(price.getStartDate())
 				.endDate(price.getEndDate())
 				.price(price.getPrice()).build();
